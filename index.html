@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>等保 2.0 记忆与模拟刷题</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="top-nav">
+        <div class="brand">
+          <span class="label">GB/T 22239-2019</span>
+          <div>
+            <h1>等保 2.0 记忆系统</h1>
+            <p>通用要求与拓展要求的闭卷默写、抽背和模拟训练。</p>
+          </div>
+        </div>
+        <section class="stats">
+          <div><strong id="totalCount">0</strong><span>控制点</span></div>
+          <div><strong id="doneCount">0</strong><span>已练</span></div>
+          <div><strong id="avgScore">0%</strong><span>均分</span></div>
+        </section>
+      </header>
+
+      <section class="studio">
+        <aside class="library">
+          <section class="filters">
+            <label>
+              <span>材料</span>
+              <select id="kindFilter"></select>
+            </label>
+            <label>
+              <span>分册/扩展</span>
+              <select id="sectionFilter"></select>
+            </label>
+            <label>
+              <span>层面</span>
+              <select id="layerFilter"></select>
+            </label>
+            <label>
+              <span>搜索</span>
+              <input id="searchInput" type="search" placeholder="控制点、条文关键词" />
+            </label>
+          </section>
+
+          <section class="mode-card">
+            <button class="mode is-active" data-mode="learn" type="button">背诵</button>
+            <button class="mode" data-mode="write" type="button">默写</button>
+            <button class="mode" data-mode="exam" type="button">模拟</button>
+          </section>
+
+          <section class="queue-card">
+            <div class="card-title">
+              <h2>知识地图</h2>
+              <button id="weakOnlyBtn" type="button">薄弱</button>
+            </div>
+            <div id="itemList" class="item-list"></div>
+          </section>
+        </aside>
+
+        <section class="main">
+          <article class="prompt-card">
+            <div class="prompt-top">
+              <span id="crumb" class="label">三级要求</span>
+              <div class="hero-actions">
+                <button id="randomBtn" class="square" type="button" title="随机抽题">↻</button>
+                <button id="clearBtn" class="square" type="button" title="清空作答">⌫</button>
+              </div>
+            </div>
+            <h2 id="title">控制点</h2>
+            <p id="questionText">从左侧选择一个控制点开始训练。</p>
+          </article>
+
+          <section id="learnPanel" class="learn-layout">
+            <article class="panel answer-panel">
+              <div class="panel-head">
+                <h3>应背条文</h3>
+                <span id="lineCount">0 条</span>
+              </div>
+              <ol id="answerList" class="answer-list"></ol>
+            </article>
+            <article class="panel method-panel">
+              <h3>记忆抓手</h3>
+              <div id="memoryFormula" class="formula"></div>
+              <h3>模拟出题方式</h3>
+              <p id="mockPrompt" class="mock-prompt"></p>
+            </article>
+          </section>
+
+          <section id="writePanel" class="panel writing hidden">
+            <div class="panel-head">
+              <h3 id="writeTitle">闭卷默写</h3>
+              <span id="charCount">0 字</span>
+            </div>
+            <textarea id="answerInput" placeholder="像考试一样默写：写出该控制点的安全要求项，尽量按 a)、b)、c) 的顺序。"></textarea>
+            <div class="actions">
+              <button id="scoreBtn" class="primary" type="button">检查覆盖度</button>
+              <button id="revealBtn" class="secondary" type="button">对照答案</button>
+            </div>
+          </section>
+
+          <section id="resultPanel" class="result hidden">
+            <div class="score">
+              <strong id="scoreNumber">0%</strong>
+              <span id="scoreComment">等待作答</span>
+            </div>
+            <div class="keyword-box">
+              <h3>关键词命中</h3>
+              <div id="keywordGrid" class="keyword-grid"></div>
+            </div>
+          </section>
+
+          <section id="revealPanel" class="panel hidden">
+            <div class="panel-head">
+              <h3>标准答案</h3>
+              <button id="hideRevealBtn" type="button">收起</button>
+            </div>
+            <ol id="revealList" class="answer-list"></ol>
+          </section>
+        </section>
+
+        <aside class="inspector">
+          <div class="inspector-card primary-card">
+            <span>当前模式</span>
+            <strong id="modeName">背诵</strong>
+          </div>
+          <div class="inspector-grid">
+            <div><span>条文数量</span><strong id="requirementCount">0</strong></div>
+            <div><span>等级标记</span><strong id="levelMark">三级</strong></div>
+          </div>
+          <div class="inspector-card">
+            <span>历史最佳</span>
+            <strong id="bestScore">未练</strong>
+          </div>
+          <div class="inspector-note">
+            <h3>训练节奏</h3>
+            <p>先背控制点标题，再默写条文主干，最后用模拟模式压缩提示信息。</p>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="./requirements-data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
