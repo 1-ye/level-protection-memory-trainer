@@ -497,6 +497,11 @@ textarea:focus {
   background: var(--green-soft);
 }
 
+.keyword-grid .partial {
+  color: #7a4d12;
+  background: #f1dfbd;
+}
+
 .keyword-grid .miss {
   color: var(--red);
   background: var(--red-soft);

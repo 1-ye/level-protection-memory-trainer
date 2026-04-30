@@ -83,6 +83,52 @@ function normalize(text) {
   return String(text || "").replace(/\s+/g, "").toLowerCase();
 }
 
+function normalizeAnswer(text) {
+  return String(text || "")
+    .replace(/[，。；;、,.:\s()（）]/g, "")
+    .replace(/[0-9]+[.)、]/g, "")
+    .toLowerCase();
+}
+
+function lcsRatio(source, target) {
+  const a = normalizeAnswer(source);
+  const b = normalizeAnswer(target);
+  if (!a || !b) return 0;
+
+  const prev = new Array(b.length + 1).fill(0);
+  const curr = new Array(b.length + 1).fill(0);
+
+  for (let i = 1; i <= a.length; i += 1) {
+    for (let j = 1; j <= b.length; j += 1) {
+      curr[j] = a[i - 1] === b[j - 1]
+        ? prev[j - 1] + 1
+        : Math.max(prev[j], curr[j - 1]);
+    }
+    for (let j = 0; j <= b.length; j += 1) prev[j] = curr[j];
+  }
+
+  return prev[b.length] / Math.max(a.length, 1);
+}
+
+function importantTerms(text) {
+  const normalized = normalizeAnswer(text);
+  const terms = [];
+  const patterns = [
+    /防震|防风|防雨|防水|防潮|防雷|防火|防静电|电磁屏蔽/g,
+    /身份鉴别|访问控制|安全审计|入侵防范|恶意代码|可信验证/g,
+    /备份|恢复|加密|密码技术|校验码|告警|审计记录|授权|审批/g,
+    /机房|网络|系统|数据|设备|虚拟机|云服务|移动终端|无线/g
+  ];
+
+  patterns.forEach((pattern) => {
+    for (const match of normalized.matchAll(pattern)) {
+      if (!terms.includes(match[0])) terms.push(match[0]);
+    }
+  });
+
+  return terms;
+}
+
 function currentItem() {
   return BANK.find((item) => item.id === state.id) || BANK[0];
 }
@@ -204,12 +250,28 @@ function renderFormula(item) {
 
 function scoreAnswer() {
   const item = currentItem();
-  const answer = normalize(els.answerInput.value);
-  const checks = item.keywords.map((keyword) => ({
-    keyword,
-    hit: answer.includes(normalize(keyword))
-  }));
-  const score = Math.round((checks.filter((item) => item.hit).length / Math.max(checks.length, 1)) * 100);
+  const answer = normalizeAnswer(els.answerInput.value);
+  const checks = item.requirements.map((line, index) => {
+    const required = normalizeAnswer(line);
+    const terms = importantTerms(line);
+    const termHits = terms.filter((term) => answer.includes(term));
+    const exact = answer.includes(required);
+    const similarity = lcsRatio(line, answer);
+    const termRatio = terms.length ? termHits.length / terms.length : 0;
+    const coverage = exact ? 1 : Math.min(1, similarity * 0.72 + termRatio * 0.28);
+
+    return {
+      keyword: `${String.fromCharCode(97 + index)}) ${line.replace(/[。；;]$/, "")}`,
+      hit: coverage >= 0.62,
+      partial: coverage >= 0.35 && coverage < 0.62,
+      coverage,
+      terms,
+      termHits
+    };
+  });
+  const score = Math.round(
+    checks.reduce((sum, check) => sum + check.coverage, 0) / Math.max(checks.length, 1) * 100
+  );
   return { score, checks };
 }
 
@@ -237,7 +299,8 @@ function renderScore(score, checks) {
   els.keywordGrid.innerHTML = "";
   checks.forEach(({ keyword, hit }) => {
     const chip = document.createElement("span");
-    chip.className = hit ? "hit" : "miss";
+    const check = checks.find((item) => item.keyword === keyword);
+    chip.className = hit ? "hit" : check?.partial ? "partial" : "miss";
     chip.textContent = keyword;
     els.keywordGrid.append(chip);
   });
