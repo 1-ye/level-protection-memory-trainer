@@ -238,13 +238,17 @@ function renderLines(container, lines) {
 }
 
 function renderFormula(item) {
-  const chips = item.requirements.map((line, index) => {
-    return `<span><b>${String.fromCharCode(97 + index)})</b> ${memoryClue(line)}</span>`;
+  const chips = item.requirements.flatMap((line, index) => {
+    const parts = memoryClues(line);
+    return parts.map((part, partIndex) => {
+      const prefix = partIndex === 0 ? `<b>${String.fromCharCode(97 + index)})</b> ` : "";
+      return `<span>${prefix}${part}</span>`;
+    });
   });
   els.memoryFormula.innerHTML = chips.join("");
 }
 
-function memoryClue(line) {
+function memoryClues(line) {
   const text = line
     .replace(/[。；;]$/g, "")
     .replace(/^应/, "")
@@ -252,29 +256,40 @@ function memoryClue(line) {
     .trim();
 
   const manual = [
-    ["火灾自动消防系统", "机房火灾自动消防：检测火情、报警、灭火"],
-    ["耐火等级", "工作房间和辅助房：耐火等级建筑材料"],
-    ["隔离防火措施", "机房区域管理：区域间隔离防火措施"],
-    ["防震、防风和防雨", "机房位置：防震、防风、防雨建筑内"],
-    ["顶层或地下室", "避免顶层或地下室，否则加强防水防潮"]
+    {
+      test: "火灾自动消防系统",
+      clues: ["机房设置火灾自动消防系统", "自动检测火情、自动报警、自动灭火"]
+    },
+    {
+      test: "耐火等级",
+      clues: ["工作房间和辅助房采用耐火等级建筑材料"]
+    },
+    {
+      test: "隔离防火措施",
+      clues: ["机房区域管理", "区域之间设置隔离防火措施"]
+    }
   ];
 
-  const matched = manual.find(([keyword]) => text.includes(keyword));
-  if (matched) return matched[1];
+  for (const rule of manual) {
+    if (text.includes(rule.test)) return rule.clues;
+  }
 
-  const compact = text
-    .replace(/包括但不限于.*/, "")
-    .replace(/例如.*/, "")
-    .replace(/如：.*/, "")
-    .replace(/等相关措施/, "等措施")
-    .replace(/，并/g, "、")
-    .replace(/，且/g, "、")
-    .trim();
+  const clauses = text
+    .split(/[；;]/)
+    .flatMap((part) => part.split(/，(?=并|应|对|在|当|包括|保证|防止|避免|记录|设置|采取|采用|提供|实现|进行|建立|制定|配置|检查|限制|控制|删除|启用|关闭|维护|保护|备份|恢复)/))
+    .map((part) => part.replace(/^(并|且|或|以及|同时)/, "").trim())
+    .filter(Boolean);
 
-  if (compact.length <= 34) return compact;
-  const firstClause = compact.split(/[，；;]/)[0];
-  if (firstClause.length >= 12 && firstClause.length <= 34) return firstClause;
-  return `${compact.slice(0, 34)}…`;
+  return clauses.map((part) => {
+    if (part.length <= 24) return part;
+    const compact = part
+      .replace(/包括但不限于.*/, "")
+      .replace(/例如.*/, "")
+      .replace(/如：.*/, "")
+      .replace(/等相关措施/, "等措施")
+      .trim();
+    return compact.length <= 28 ? compact : `${compact.slice(0, 28)}…`;
+  });
 }
 
 function scoreAnswer() {
