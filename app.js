@@ -238,58 +238,11 @@ function renderLines(container, lines) {
 }
 
 function renderFormula(item) {
-  const chips = item.requirements.flatMap((line, index) => {
-    const parts = memoryClues(line);
-    return parts.map((part, partIndex) => {
-      const prefix = partIndex === 0 ? `<b>${String.fromCharCode(97 + index)})</b> ` : "";
-      return `<span>${prefix}${part}</span>`;
-    });
+  const chips = item.requirements.map((line, index) => {
+    const full = line.replace(/[。；;]$/, "");
+    return `<span><b>${String.fromCharCode(97 + index)})</b> ${full}</span>`;
   });
   els.memoryFormula.innerHTML = chips.join("");
-}
-
-function memoryClues(line) {
-  const text = line
-    .replace(/[。；;]$/g, "")
-    .replace(/^应/, "")
-    .replace(/^保证/, "")
-    .trim();
-
-  const manual = [
-    {
-      test: "火灾自动消防系统",
-      clues: ["机房设置火灾自动消防系统", "自动检测火情、自动报警、自动灭火"]
-    },
-    {
-      test: "耐火等级",
-      clues: ["工作房间和辅助房采用耐火等级建筑材料"]
-    },
-    {
-      test: "隔离防火措施",
-      clues: ["机房区域管理", "区域之间设置隔离防火措施"]
-    }
-  ];
-
-  for (const rule of manual) {
-    if (text.includes(rule.test)) return rule.clues;
-  }
-
-  const clauses = text
-    .split(/[；;]/)
-    .flatMap((part) => part.split(/，(?=并|应|对|在|当|包括|保证|防止|避免|记录|设置|采取|采用|提供|实现|进行|建立|制定|配置|检查|限制|控制|删除|启用|关闭|维护|保护|备份|恢复)/))
-    .map((part) => part.replace(/^(并|且|或|以及|同时)/, "").trim())
-    .filter(Boolean);
-
-  return clauses.map((part) => {
-    if (part.length <= 24) return part;
-    const compact = part
-      .replace(/包括但不限于.*/, "")
-      .replace(/例如.*/, "")
-      .replace(/如：.*/, "")
-      .replace(/等相关措施/, "等措施")
-      .trim();
-    return compact.length <= 28 ? compact : `${compact.slice(0, 28)}…`;
-  });
 }
 
 function scoreAnswer() {
