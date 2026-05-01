@@ -391,25 +391,19 @@ textarea:focus {
 }
 
 .formula {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .formula span {
-  display: block;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid rgba(184, 135, 70, 0.28);
-  border-radius: 10px;
+  border-radius: 999px;
   color: #6c461a;
   background: var(--bronze-soft);
-  font-size: 14px;
-  font-weight: 800;
-  line-height: 1.65;
-}
-
-.formula b {
-  margin-right: 4px;
-  color: #422a0d;
+  font-size: 13px;
+  font-weight: 900;
 }
 
 .mock-prompt {

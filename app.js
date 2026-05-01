@@ -239,8 +239,11 @@ function renderLines(container, lines) {
 
 function renderFormula(item) {
   const chips = item.requirements.map((line, index) => {
-    const full = line.replace(/[。；;]$/, "");
-    return `<span><b>${String.fromCharCode(97 + index)})</b> ${full}</span>`;
+    const short = line
+      .replace(/^应/, "")
+      .replace(/[，。；;].*$/, "")
+      .slice(0, 18);
+    return `<span>${String.fromCharCode(97 + index)}) ${short}</span>`;
   });
   els.memoryFormula.innerHTML = chips.join("");
 }
