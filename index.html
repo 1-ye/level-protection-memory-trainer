@@ -16,7 +16,7 @@
             <p>通用要求与拓展要求的闭卷默写、抽背和模拟训练。</p>
           </div>
         </div>
-        <section class="stats">
+        <a href="./quiz.html" class="primary" style="padding:12px;border-radius:10px;text-decoration:none">进入刷题 →</a><section class="stats">
           <div><strong id="totalCount">0</strong><span>控制点</span></div>
           <div><strong id="doneCount">0</strong><span>已练</span></div>
           <div><strong id="avgScore">0%</strong><span>均分</span></div>
@@ -95,7 +95,7 @@
             </div>
             <textarea id="answerInput" placeholder="像考试一样默写：写出该控制点的安全要求项，尽量按 a)、b)、c) 的顺序。"></textarea>
             <div class="actions">
-              <button id="scoreBtn" class="primary" type="button">检查覆盖度</button>
+              <button id="scoreBtn" class="primary" type="button">检查文字覆盖度</button>
               <button id="revealBtn" class="secondary" type="button">对照答案</button>
             </div>
           </section>
@@ -106,14 +106,14 @@
               <span id="scoreComment">等待作答</span>
             </div>
             <div class="keyword-box">
-              <h3>关键词命中</h3>
+              <h3>文字覆盖度估算 · 不能代替阅卷</h3>
               <div id="keywordGrid" class="keyword-grid"></div>
             </div>
           </section>
 
           <section id="revealPanel" class="panel hidden">
             <div class="panel-head">
-              <h3>标准答案</h3>
+              <h3>条文对照（原有材料）</h3>
               <button id="hideRevealBtn" type="button">收起</button>
             </div>
             <ol id="revealList" class="answer-list"></ol>

@@ -56,7 +56,7 @@ function loadStats() {
 }
 
 function saveStats() {
-  localStorage.setItem(STORE_KEY, JSON.stringify(state.stats));
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state.stats)); } catch { alert("浏览器无法保存记录，请允许本地存储。"); }
 }
 
 function optionList(select, values, label) {
@@ -141,7 +141,7 @@ function filteredItems() {
 
   return BANK.filter((item) => {
     const stat = state.stats[item.id];
-    const weak = !stat || stat.best < 80;
+    const weak = !stat || stat.last < 80;
     const text = normalize([
       item.kind,
       item.section,
@@ -189,7 +189,7 @@ function renderList() {
     button.type = "button";
     button.innerHTML = `
       <span>${item.control}</span>
-      <small>${item.section} · ${item.layer} · ${stat ? `最佳 ${stat.best}%` : "未练"}</small>
+      <small>${item.section} · ${item.layer} · ${stat ? `最近 ${stat.last}%` : "未练"}</small>
     `;
     button.addEventListener("click", () => {
       state.id = item.id;
@@ -374,7 +374,8 @@ els.clearBtn.addEventListener("click", () => {
 
 els.randomBtn.addEventListener("click", () => {
   const items = filteredItems();
-  const pool = items.length ? items : BANK;
+  if (!items.length) return;
+  const pool = items;
   state.id = pool[Math.floor(Math.random() * pool.length)].id;
   clearPractice();
   render();
